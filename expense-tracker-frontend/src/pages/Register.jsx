@@ -49,6 +49,9 @@ function Register(){
             <br/>
             <br/>
             <button onClick={handleRegister}>Register</button>
+            <p>
+                Already have an account? <Link to="/login">Login</Link>
+            </p>
         </div>
     )
 }

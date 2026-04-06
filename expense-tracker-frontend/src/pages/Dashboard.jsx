@@ -24,6 +24,7 @@ function Dashboard() {
         fetchUser();
         fetchExpenses();
         fetchMonthlySummary();
+        fetchCategorySummary();
     }, []);
     const fetchExpenses = async () => {
         const response = await apiRequest("/expenses", "GET");
@@ -96,6 +97,21 @@ function Dashboard() {
             }
         }
     };
+    const [categorySummary,setCategorySummary]=useState([]);
+    const fetchCategorySummary = async() => {
+        const response = await apiRequest(`/expenses/summary/category?month=${month}`,"GET");
+        if (response==null){
+            console.log("Failed to fetch expenses");
+        }
+        else{
+            if (response.status==="success"){
+                setCategorySummary(response.data);
+            }
+            else{
+                console.log("Error fetching expenses");
+            }
+        }
+    };
 
 
     return (
@@ -130,6 +146,11 @@ function Dashboard() {
             <button onClick={handleAddExpense}>Add Expense</button>
 
             <p>Monthly Total: {monthlyTotal}</p>
+            {categorySummary.map((cat)=> (
+                <div key={cat.category}>
+                    <p>{cat.category}-{cat.total}</p>
+                </div>
+            ))}
         </div>
     );
 }
