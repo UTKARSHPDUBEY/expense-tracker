@@ -9,7 +9,7 @@ from auth import token_required
 summary_bp=Blueprint("summary_bp",__name__)
 
 
-@summary_bp.route("/monthly",methods=['GET'])
+@summary_bp.route("/monthly",methods=['GET','OPTIONS'])
 @token_required
 def get_monthly_summary(current_user):
     user_id=current_user["user_id"]
@@ -50,7 +50,7 @@ def get_monthly_summary(current_user):
 
 
 
-@summary_bp.route("/category",methods=['GET'])
+@summary_bp.route("/category",methods=['GET','OPTIONS'])
 @token_required
 def get_category_summary(current_user):
     user_id=current_user["user_id"]

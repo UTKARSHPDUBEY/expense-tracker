@@ -2,13 +2,15 @@ from flask import request,Blueprint
 from db import get_connection
 from utils import error_response,success_response
 from auth import token_required
+import traceback
+from datetime import datetime
 
 expenses_bp=Blueprint("expenses",__name__)
 
 
 
 
-@expenses_bp.route('/',methods=['POST'])
+@expenses_bp.route('/',methods=['POST','OPTIONS'])
 @token_required
 def add_expense(current_user):
     data=request.json
@@ -24,6 +26,14 @@ def add_expense(current_user):
         amount=float(amount)
     except ValueError:
         return error_response("Amount should be number",400)
+    
+    # Convert ISO format datetime to MySQL DATETIME format
+    try:
+        dt_obj = datetime.fromisoformat(expense_datetime.replace('Z', '+00:00'))
+        expense_datetime = dt_obj.strftime('%Y-%m-%d %H:%M:%S')
+    except Exception as e:
+        return error_response(f"Invalid datetime format: {str(e)}", 400)
+    
     user_id=current_user["user_id"]
     con=get_connection()
     if not con:
@@ -43,7 +53,9 @@ def add_expense(current_user):
             "description": description,
             "expense_datetime": expense_datetime},201)
     except Exception as e:
-        return error_response("Internal server error",500)
+        print("Error adding expense:", str(e))
+        traceback.print_exc()
+        return error_response(f"Internal server error: {str(e)}",500)
     finally:
         if cursor:
             cursor.close()
@@ -53,7 +65,7 @@ def add_expense(current_user):
 
 
 
-@expenses_bp.route('/',methods=['GET'])
+@expenses_bp.route('/',methods=['GET','OPTIONS'])
 @token_required
 def get_expenses(current_user):
     user_id=current_user["user_id"]
@@ -78,7 +90,7 @@ def get_expenses(current_user):
 
 
 
-@expenses_bp.route('/<int:expense_id>', methods=['PUT'])
+@expenses_bp.route('/<int:expense_id>', methods=['PUT','OPTIONS'])
 @token_required
 def update_expense(current_user, expense_id):
     data = request.json
@@ -157,7 +169,7 @@ def update_expense(current_user, expense_id):
 
 
 
-@expenses_bp.route('/<int:expense_id>', methods=['DELETE'])
+@expenses_bp.route('/<int:expense_id>', methods=['DELETE','OPTIONS'])
 @token_required
 def delete_expense(current_user, expense_id):
     user_id=current_user["user_id"]

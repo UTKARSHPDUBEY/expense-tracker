@@ -13,6 +13,8 @@ auth_bp = Blueprint("auth", __name__)
 def token_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return "", 200
         auth_headers=request.headers.get("Authorization")
         if not auth_headers:
             return error_response("Authorization header missing",401)
@@ -35,7 +37,7 @@ def token_required(f):
 
 
 
-@auth_bp.route('/me',methods=['GET'])
+@auth_bp.route('/me',methods=['GET','OPTIONS'])
 @token_required
 def get_me(current_user):
     con=get_connection()
@@ -59,7 +61,7 @@ def get_me(current_user):
 
 
 
-@auth_bp.route('/register',methods=['POST'])
+@auth_bp.route('/register',methods=['POST','OPTIONS'])
 def post_user():
     data=request.json
     if not data:
@@ -104,8 +106,10 @@ def post_user():
 
 
 
-@auth_bp.route('/login',methods=['POST'])
+@auth_bp.route('/login',methods=['POST','OPTIONS'])
 def login():
+    if request.method == 'OPTIONS':
+        return "", 200
     data=request.json
     if not data:
         return error_response("No data available",400)

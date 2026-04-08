@@ -1,5 +1,8 @@
 import React,{useState} from "react"
 import { apiRequest } from "../services/api";
+import { Link } from  "react-router-dom";
+import "../styles.css";
+
 function Register(){
     const handleRegister =async ()=>{
         const response = await apiRequest("/auth/register", "POST",{
@@ -14,7 +17,7 @@ function Register(){
             if (response.status === "success") {
                 console.log(response.message);
             } else {
-                console.log("Registration failed");
+                console.log(response.message);
             }
         }
     };
@@ -22,7 +25,7 @@ function Register(){
     const [password,setPassword]=useState("");
     const [name,setName]=useState("");
     return (
-        <div>
+        <div className="container">
             <h2>REGISTER</h2>
             <input
                 type="text"
@@ -30,24 +33,18 @@ function Register(){
                 value={name}
                 onChange={(e)=>setName(e.target.value)}
             />
-            <br/>
-            <br/>
             <input
                 type="email"
                 placeholder="Enter email"
                 value={email}
                 onChange={(e)=>setEmail(e.target.value)}
             />
-            <br/>
-            <br/>
             <input
                 type="password"
                 placeholder="Enter password"
                 value={password}
                 onChange={(e)=>setPassword(e.target.value)}
             />
-            <br/>
-            <br/>
             <button onClick={handleRegister}>Register</button>
             <p>
                 Already have an account? <Link to="/login">Login</Link>

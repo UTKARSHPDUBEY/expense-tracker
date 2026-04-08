@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { apiRequest } from "../services/api";
+import "../styles.css";
 
 function Dashboard() {
     const [name, setName] = useState("");
@@ -16,7 +17,7 @@ function Dashboard() {
                     setName(response.data.name);
                     setEmail(response.data.email);
                 } else {
-                    console.log("Error fetching user");
+                    console.log(response.message);
                 }
             }
         };
@@ -35,7 +36,7 @@ function Dashboard() {
             if (response.status === "success") {
                 setExpenses(response.data);
             } else {
-                console.log("Error fetching expenses");
+                console.log(response.message);
             }
         }
     };
@@ -53,11 +54,13 @@ function Dashboard() {
             if (response.status === "success") {
                 console.log(response.message);
                 fetchExpenses();
+                fetchMonthlySummary();
+                fetchCategorySummary();
                 setAmount("");
                 setCategory("");
                 setDescription("");
             } else {
-                console.log("Failed to add expense");
+                console.log(response.message);
             }
         }
     };
@@ -71,7 +74,7 @@ function Dashboard() {
                 console.log(response.message);
                 fetchExpenses();
             } else {
-                console.log("Failed to delete expense");
+                console.log(response.message);
             }
         }
     };
@@ -115,42 +118,51 @@ function Dashboard() {
 
 
     return (
-        <div>
+        <div className="dashboard-container">
             <h2>DASHBOARD</h2>
-            <p>Name: {name}</p>
-            <p>Email: {email}</p>
+            <div className="user-info">
+                <p><strong>Name:</strong> {name}</p>
+                <p><strong>Email:</strong> {email}</p>
+            </div>
+
+            <div className="expense-form">
+                <input 
+                    type="number"
+                    placeholder="Amount"
+                    value={amount}
+                    onChange={(e)=>setAmount(e.target.value)}
+                />
+                <input 
+                    type="text"
+                    placeholder="Category"
+                    value={category}
+                    onChange={(e)=>setCategory(e.target.value)}
+                />
+                <input 
+                    type="text"
+                    placeholder="Description"
+                    value={description}
+                    onChange={(e)=>setDescription(e.target.value)}
+                />
+                <button onClick={handleAddExpense}>Add Expense</button>
+            </div>
+
             {expenses.map((expense)=> (
-                <div key={expense.id}>
-                    <p>{expense.category}-{expense.amount}-{expense.description}</p>
+                <div key={expense.id} className="expense-item">
+                    <span><strong>{expense.category}</strong>: ${expense.amount} - {expense.description}</span>
                     <button onClick={() => handleDelete(expense.id)}>Delete</button>
                 </div>
             ))}
-            <input 
-                type="number"
-                placeholder="Amount"
-                value={amount}
-                onChange={(e)=>setAmount(e.target.value)}
-            />
-            <input 
-                type="text"
-                placeholder="Category"
-                value={category}
-                onChange={(e)=>setCategory(e.target.value)}
-            />
-            <input 
-                type="text"
-                placeholder="Description"
-                value={description}
-                onChange={(e)=>setDescription(e.target.value)}
-            />
-            <button onClick={handleAddExpense}>Add Expense</button>
 
-            <p>Monthly Total: {monthlyTotal}</p>
-            {categorySummary.map((cat)=> (
-                <div key={cat.category}>
-                    <p>{cat.category}-{cat.total}</p>
-                </div>
-            ))}
+            <div className="summary-section">
+                <h3>Summary</h3>
+                <p><strong>Monthly Total:</strong> ${monthlyTotal}</p>
+                {categorySummary.map((cat)=> (
+                    <div key={cat.category} className="category-summary">
+                        <p>{cat.category}: ${cat.total}</p>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
