@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../services/api";
 import "../styles.css";
 
 function Dashboard() {
+    const navigate = useNavigate();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [expenses, setExpenses]=useState([]);
@@ -78,6 +80,12 @@ function Dashboard() {
             }
         }
     };
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/login");
+    };
+
     const [amount,setAmount]=useState("");
     const [category,setCategory]=useState("");
     const [description,setDescription]=useState("");
@@ -123,6 +131,7 @@ function Dashboard() {
             <div className="user-info">
                 <p><strong>Name:</strong> {name}</p>
                 <p><strong>Email:</strong> {email}</p>
+                <button className="logout-button" onClick={handleLogout}>Logout</button>
             </div>
 
             <div className="expense-form">
